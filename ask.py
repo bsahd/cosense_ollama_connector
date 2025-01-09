@@ -50,7 +50,7 @@ def ask(input_str, index_file):
 	global ask_loading
 	ask_loading = True
 	response = ollama.chat(
-        model="hf.co/alfredplpl/llm-jp-3-1.8b-instruct-gguf:Q4_K_M",
+        model="hf.co/alfredplpl/llm-jp-3-1.8b-instruct-gguf:IQ4_XS",
 		messages=[{"role": "user", "content": prompt}],
 		stream=True,
 	)

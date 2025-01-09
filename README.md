@@ -1,18 +1,11 @@
-# このforkによる変更点
-- プロンプトを変更
-- LLMにプロンプトを送信する前にベクトル検索結果を表示し確認
-- OllamaによるローカルLLMを使用する
-- 応答の表示をstreamでする
-- 進捗表示の詳細化
+# Cosense Ollama Connector
 
-# Scrapbox ChatGPT Connector
-
-The Scrapbox ChatGPT Connector is a simple script for connecting Scrapbox and ~~ChatGPT~~.
+The Cosense Ollama Connector is a simple script for connecting Cosense and Ollama.
 
 The script is designed so that developers can easily grasp the big picture and customize it to their own needs. Also, the purpose of the project is to show a simple implementation, not to satisfy a wide variety of needs. I encourage everyone to understand the source code and customize it to their own needs.
 
 ## For Japanese reader
-Visit https://scrapbox.io/villagepump/Scrapbox_ChatGPT_Connector
+Visit https://scrapbox.io/villagepump/bsahd%2Fcosense_ollama_connector
 
 
 ## How to install
@@ -21,14 +14,18 @@ Clone the GitHub repository.
 
 Run the following commands to install the required libraries.
 
-$ pip install -r requirements.txt
+```sh
+python -m venv venv
+./venv/bin/pip install -r requirements.txt
+```
+
+install Ollama models.
+```sh
+ollama pull kun432/cl-nagoya-ruri-large # Japanese-tuned BERT-Based embedding model
+ollama pull hf.co/alfredplpl/llm-jp-3-1.8b-instruct-gguf:IQ4_XS # Small size LLM for Japanese
+```
 
 ## How to use
-Obtain an OpenAI API token and save it in an .env file.
-
-```
- OPENAI_API_KEY=sk-...
-```
 
 Make index.
 
@@ -36,10 +33,10 @@ $ python make_index.py
 
 It outputs like below:
 
-code::
+```
  % python make_index.py
-  97%|███████████████████████████████████████████████████████████████████████████████████████████████████▉ | 846/872 [07:06<00:10, 2.59 It/s]The server is currently overloaded with other requests. Sorry about that! You can retry your request, or contact us through our help center at help. openai.com if the error persists.
- 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████| 872/872 [07:45<00:00, 1 .87it/s] 
+ 100%|█████████████████████████████████████| 872/872 [07:45<00:00, 1 .87it/s] 
+ ```
 
 Ask. 
 
@@ -52,5 +49,5 @@ It outputs like below:
 > The most important question is to know ourselves.
 ```
 
-License
+# License
 The Scrapbox ChatGPT Connector is distributed under the MIT License. See the LICENSE file for more information.

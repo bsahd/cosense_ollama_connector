@@ -137,7 +137,7 @@ class VectorStore:
 
 if __name__ == "__main__":
 	# Sample default arguments for update_from_scrapbox()
-	JSON_FILE = "from_scrapbox/qualia-san.json"
+	JSON_FILE = "from_cosense/qualia-san.json"
 	INDEX_FILE = "qualia-san.pickle"
 
 	update_from_scrapbox(JSON_FILE, INDEX_FILE)
