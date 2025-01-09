@@ -50,4 +50,4 @@ It outputs like below:
 ```
 
 # License
-The Scrapbox ChatGPT Connector is distributed under the MIT License. See the LICENSE file for more information.
+The Cosense Ollama Connector is distributed under the MIT License. See the LICENSE file for more information.
