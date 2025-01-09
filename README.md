@@ -1,6 +1,13 @@
+# このforkによる変更点
+- プロンプトを変更
+- LLMにプロンプトを送信する前にベクトル検索結果を表示し確認
+- OllamaによるローカルLLMを使用する
+- 応答の表示をstreamでする
+- 進捗表示の詳細化
+
 # Scrapbox ChatGPT Connector
 
-The Scrapbox ChatGPT Connector is a simple script for connecting Scrapbox and ChatGPT.
+The Scrapbox ChatGPT Connector is a simple script for connecting Scrapbox and ~~ChatGPT~~.
 
 The script is designed so that developers can easily grasp the big picture and customize it to their own needs. Also, the purpose of the project is to show a simple implementation, not to satisfy a wide variety of needs. I encourage everyone to understand the source code and customize it to their own needs.
 

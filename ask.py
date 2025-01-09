@@ -1,63 +1,74 @@
-import openai
-from make_index import VectorStore, get_size
+import json
+import os
+import sys
+import time
+import ollama
+from make_index import VectorStore
+from yaspin import yaspin
+import rich, rich.table, rich.console, rich.style,rich.prompt,rich.pager
 
+console = rich.console.Console()
 
 PROMPT = """
-You are virtual character. Read sample output of the character in the following sample section. Then reply to the input.
-## Sample
+あなたは利用者の役に立つために最善を尽くす助手です。
+1. 以下の質問のヒントを読み込んでください。
+3. それを使用して、質問に対する返答を行います。
+## 質問のヒント
 {text}
-## Input
+## 質問
 {input}
 """.strip()
 
 
-MAX_PROMPT_SIZE = 4096
+
+MAX_PROMPT_SIZE = 1024
 RETURN_SIZE = 250
+
+ask_loading = False
 
 
 def ask(input_str, index_file):
-    PROMPT_SIZE = get_size(PROMPT)
-    rest = MAX_PROMPT_SIZE - RETURN_SIZE - PROMPT_SIZE
-    input_size = get_size(input_str)
-    if rest < input_size:
-        raise RuntimeError("too large input!")
-    rest -= input_size
+	vs = VectorStore(index_file)
+	samples = vs.get_sorted(input_str)
+	to_use: list[str] = []
+	table = rich.table.Table(
+		title="ベクトル検索結果", title_style=rich.style.Style(italic=False),show_lines=True
+	)
+	table.add_column("ページ名", no_wrap=True)
+	table.add_column("類似度", no_wrap=True)
+	table.add_column("テキスト", overflow="fold")
+	for sim, body, title in samples[0:4]:
+		to_use.append(f"### ページ「{title}」の一部(類似度:{round(sim,4)}):\n" + body)
+		table.add_row(title, str(round(sim, 4)), body)
+	# return
+	text = "\n\n".join(to_use)
+	prompt = PROMPT.format(input=input_str, text=text)
+	console.print(table)
+	if not rich.prompt.Confirm.ask("Continue?"):
+		return
 
-    vs = VectorStore(index_file)
-    samples = vs.get_sorted(input_str)
-
-    to_use = []
-    used_title = []
-    for _sim, body, title in samples:
-        if title in used_title:
-            continue
-        size = get_size(body)
-        if rest < size:
-            break
-        to_use.append(body)
-        used_title.append(title)
-        rest -= size
-
-    text = "\n\n".join(to_use)
-    prompt = PROMPT.format(input=input_str, text=text)
-
-    print("\nTHINKING...")
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=RETURN_SIZE,
-        temperature=0.0,
-    )
-
-    # show question and answer
-    content = response['choices'][0]['message']['content']
-    print("\nANSWER:")
-    print(f">>>> {input_str}")
-    print(">", content)
-
+	global ask_loading
+	ask_loading = True
+	response = ollama.chat(
+        model="hf.co/alfredplpl/llm-jp-3-1.8b-instruct-gguf:Q4_K_M",
+		messages=[{"role": "user", "content": prompt}],
+		stream=True,
+	)
+	# show question and answer
+	starttime = time.time()
+	with yaspin() as sp:
+		sp.text = f"LLM is reading prompt({len(prompt)} chars)..."
+		sp._timer = True
+		for chunk in response:
+			if ask_loading:
+				sp.ok(
+					f"{round(time.time() - starttime,1)} seconds elapsed in reading({len(prompt)} chars)."
+				)
+				sp._timer = False
+				print(f">>>> {input_str}")
+				ask_loading = False
+			print(chunk.message.content or "", end="", flush=True)
+	print(f"\n{round(time.time() - starttime,1)} seconds elapsed")
 
 if __name__ == "__main__":
-    ask("Scrapbox ChatGPT Connectorって何？", "tiny_sample.pickle")
-    ask("クオリアさん、日本語で自己紹介して", "tiny_sample.pickle")
+	ask(" ".join(sys.argv[1:]), "qualia-san.pickle")
