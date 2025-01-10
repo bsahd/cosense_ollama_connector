@@ -21,6 +21,7 @@ Run the following commands to install the required libraries.
 ```sh
 python -m venv venv
 ./venv/bin/pip install -r requirements.txt
+source ./venv/bin/activate # fish: source ./venv/bin/activate.fish ; csh: source ./venv/bin/activate.csh ; powershell: source ./venv/bin/activate.ps1
 ```
 
 install Ollama models.
